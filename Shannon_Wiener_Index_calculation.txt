@@ -1,0 +1,26 @@
+i <- "C:/Users/koutsad3/OneDrive - Aalto University/European Energy Markets/OSMOSYS_SMAA/Scenarios_Greee/Scenarios_Greee/Explorative_average price"
+i <- "C:/Users/koutsad3/OneDrive - Aalto University/European Energy Markets/OSMOSYS_SMAA/Scenarios_Greee/Scenarios_Greee/Explorative_decreased price (-50%)"
+i <- "C:/Users/koutsad3/OneDrive - Aalto University/European Energy Markets/OSMOSYS_SMAA/Scenarios_Greee/Scenarios_Greee/Baseline_average price/Average price"
+
+setwd(i)
+prod<- read.csv(file = 'ProductionByTechnologyAnnual.csv', stringsAsFactors=FALSE)
+prod<-data.frame(prod, stringsAsFactors=FALSE)
+
+shanind<-NULL
+
+tech<- c("GEOPWR_H", "GEOPWR_M", "GRMBMCHP00", "GRMCOSCP00", "GRMCOSCP00_Ptol", "GRMHFSTP00", "GRMHYDMS01", "GRMHYDMS02", "GRMHYDMS03",
+         "GRMNGCCP00","GRMNGGCP00","GRMSOC1P00","GRMSOU1P03","GRMSOV1F01","GRMWIP00","GRMWIP01","NGCHPPWR")
+
+
+par<-prod[prod$t %in% tech & prod$y>2022,] %>% group_by(y,t)%>% summarize(ProductionByTechnologyAnnual = sum(ProductionByTechnologyAnnual))
+
+for (j in unique(par$y)){
+  
+  por<-par[par$y==j & par$ProductionByTechnologyAnnual!=0,]$ProductionByTechnologyAnnual/sum(par[par$y==j,]$ProductionByTechnologyAnnual)
+  
+  shan<- -sum(por*log(por, exp(1)))
+  
+  shanind<-c(shanind,shan)
+  
+}
+shantot<-sum(shanind)
